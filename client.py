@@ -10,12 +10,21 @@ print(first)
 
 while True:
     
-    message = input('Send message: ')
+    message = str(input('Send message: '))
+    message += 'END_LINE'
     client.send(message.encode())
-    server_message = client.recv(4096).decode()
-    print(server_message)
     
-    if server_message == 'End_connection':
+    data = b''
+    data += client.recv(4096)
+    while b'END_LINE' not in data:
+        data += client.recv(100)
+        
+    data = data.decode()
+    data = data.split(' END_LINE')
+    data = data[0]
+    print(data)
+    
+    if data == 'End_connection':
         break
         
 client.close()
